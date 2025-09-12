@@ -1,0 +1,763 @@
+{
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Glog.AI",
+          "organization": "Glog.AI",
+          "fullName": "Glog, Making software more secure",
+          "version": "1.0.0",
+          "semanticVersion": "1.0.0",
+          "informationUri": "https://www.glog.ai",
+          "rules": [
+            {
+              "id": "glog-5ea64a34-bc18-4e26-9e0a-20357f623702",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `ADD` command in Dockerfile has the ability to automatically extract compressed files, and it can also download files from a URL. This can potentially lead to man-in-the-middle attacks if the URL is compromised. On the other hand, the `COPY` command only copies files from the local file system and does not have these additional capabilities, making it a safer choice.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the `COPY` command instead of `ADD` unless you specifically need the additional capabilities of `ADD`. This reduces the attack surface and makes your Dockerfile more secure.\n\n## Source Code Fix Recommendation\n\nReplace the `ADD` command with `COPY`:\n\n```Dockerfile\nCOPY bare_system/Makefile Makefile\n```\n\n## Library Dependencies\n\nThis code does not require any JavaScript library dependencies to execute properly.\n\n## References\n\n- [OWASP Docker Security](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-494: Download of Code Without Integrity Check](https://cwe.mitre.org/data/definitions/494.html)\n\nPlease note that the links provided are active and accessible for anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-784a08a4-603d-44a8-97ea-2d001b75b5db",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Docker, the `sudo` command is often used to execute commands with root privileges. This can lead to security vulnerabilities as it allows any user to execute any command as the root user. This is especially dangerous in Docker containers, where the root user has full control over the container. \n\nThe `RUN sudo usermod -aG sudo sysadmin` command in a Dockerfile adds the `sysadmin` user to the `sudo` group, which means that the `sysadmin` user can execute any command as the root user. This can lead to privilege escalation and other security vulnerabilities.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using the `sudo` command in Dockerfiles. Instead, use the `USER` directive to specify a non-root user for running commands. This limits the potential damage that can be done if the container is compromised.\n\n## Source Code Fix Recommendation\n\nInstead of:\n\n```Dockerfile\nRUN sudo usermod -aG sudo sysadmin\n```\n\nUse:\n\n```Dockerfile\nRUN useradd -m sysadmin\nUSER sysadmin\n```\n\nThis creates a new user `sysadmin` and switches to that user for subsequent commands.\n\n## Library Dependencies\n\nThis code does not require any specific Python library dependencies to execute properly.\n\n## References\n\n- [CWE-250: Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)"
+              },
+              "properties": {
+                "tags": [
+                  "dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile"
+                ]
+              }
+            },
+            {
+              "id": "glog-10facaed-e5a2-4966-8a85-f3d6639dd4c4",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Docker, it's a common practice to run processes as a root user. However, this can lead to security vulnerabilities as it gives the process full control over the system. This is especially risky if the process is compromised. Similarly, using `sudo` in Dockerfiles can also lead to security issues. The `sudo` command allows a permitted user to execute a command as the superuser or another user, as specified by the security policy. If a Dockerfile is written to use `sudo`, it means that the Docker image is running processes with unnecessary root privileges, which can be exploited by attackers.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it's recommended to avoid using `sudo` in Dockerfiles and to run processes as a non-root user. This can be achieved by creating a new user and switching to it before executing any commands. This way, even if the process is compromised, the potential damage is limited as the process does not have root access to the system.\n\n## Source Code Fix Recommendation\n\nHere is a recommended fix for the provided code:\n\n```Dockerfile\nRUN useradd -ms /bin/bash newuser\nUSER newuser\nRUN chmod 0440 /etc/sudoers.d/sysadmin\n```\n\nIn this fix, a new user `newuser` is created and switched to before executing the `chmod` command. This ensures that the command is not run with root privileges.\n\n## Library Dependencies\n\nThe provided code does not require any specific Python library dependencies to execute properly.\n\n## References\n\n- [CWE-250: Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)"
+              },
+              "properties": {
+                "tags": [
+                  "dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile"
+                ]
+              }
+            },
+            {
+              "id": "glog-46a9837c-58aa-45cd-85e0-138ff072dccd",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nA potential Man-in-the-Middle (MitM) attack vulnerability due to the ADD command in URL file inclusion can occur in Python programming language when an attacker is able to intercept and alter the communication between two parties without their knowledge. This vulnerability is particularly dangerous when the ADD command is used in Dockerfile to fetch remote resources over an insecure protocol (like HTTP), which can be intercepted and replaced with malicious content.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to:\n\n1. Avoid using the ADD command to fetch remote resources in Dockerfile. Instead, use the COPY command for local files and directories.\n2. If remote resources are necessary, ensure they are fetched over a secure protocol (like HTTPS) to prevent interception.\n3. Validate the integrity of the fetched resources, for example by checking a cryptographic hash.\n\n## Source Code Fix Recommendation\n\nReplace the ADD command with the COPY command for local files and directories. If remote resources are necessary, fetch them over a secure protocol and validate their integrity.\n\n```python\n# Instead of:\n# ADD bare_system bare_system\n\n# Use:\nCOPY bare_system bare_system\n```\n\n## Library Dependencies\n\nThe code example does not require any specific Python library dependencies to execute properly.\n\n## References\n\n- [CWE-300: Channel Accessible by Non-Endpoint ('Man-in-the-Middle')](https://cwe.mitre.org/data/definitions/300.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-0e41b8b1-7727-4c1b-8d0a-90c0f2f9b6e4",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn JavaScript programming, the use of the `ADD` command in URL file inclusion can potentially lead to a man-in-the-middle attack. This is because the `ADD` command can be used to include a file from a remote URL, which can be intercepted and modified by an attacker. This can lead to the execution of malicious code, unauthorized access, or data leakage.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the `COPY` command instead of the `ADD` command. The `COPY` command copies files from the local file system, which is safer because it does not involve the use of a network connection that can be intercepted.\n\n## Source Code Fix Recommendation\n\nReplace the `ADD` command with the `COPY` command:\n\n```javascript\nCOPY rocm rocm\n```\n\n## Library Dependencies\n\nThis code example does not require any specific library dependencies to execute properly.\n\n## OWASP and CWE Resources\n\n- [OWASP - Unvalidated Redirects and Forwards Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html)\n- [CWE-601: URL Redirection to Untrusted Site ('Open Redirect')](https://cwe.mitre.org/data/definitions/601.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-4db867b0-21b6-445a-b43a-a0b3fab70945",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Python programming, the `ADD` command in Dockerfile is used to copy new files, directories or remote file URLs from `<src>` and add them to the filesystem of the image at the path `<dest>`. However, this command can lead to a potential Man-in-the-Middle (MitM) attack when used to include a URL file. This is because the `ADD` command automatically extracts a downloaded archive into the image, which can be exploited by an attacker to inject malicious code.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the `COPY` command instead of `ADD` for copying local files. The `COPY` command is more transparent because it only supports the basic copying of local files into the container, without the `tar` and remote URL handling capabilities of `ADD`.\n\n## Source Code Fix Recommendation\n\nReplace the `ADD` command with the `COPY` command:\n\n```Dockerfile\nCOPY tools tools\n```\n\n## Library Dependencies\n\nThe code example does not require any library dependencies to execute properly.\n\n## References\n\n- [OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-494: Download of Code Without Integrity Check](https://cwe.mitre.org/data/definitions/494.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-0dc15d97-fcbd-4a90-97df-53b88c051cb5",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Python programming, the `ADD` command is used to copy new files, directories or remote file URLs from `<src>` and add them to the filesystem of the image at the path `<dest>`. However, it poses a potential risk of a Man-in-the-Middle (MitM) attack. This is because the `ADD` command can use URLs to fetch data from remote locations. If the connection is not secured, an attacker could potentially intercept the data and replace it with malicious content.\n\nThe `COPY` command is preferred over the `ADD` command as it only supports the basic copying of local files into the container, reducing the risk of MitM attacks.\n\n## Mitigation Advice\n\nTo mitigate this risk, it is recommended to use the `COPY` command instead of the `ADD` command whenever possible. If the `ADD` command is necessary, ensure that the connection is secured and the source is trusted.\n\n## Source Code Fix Recommendation\n\nReplace the `ADD` command with the `COPY` command:\n\n```python\nCOPY extras/image/etc  /etc\n```\n\n## Library Dependencies\n\nThere are no library dependencies required by the code example.\n\n## OWASP Resources\n\n- [OWASP Top 10 2017 Category A6 - Security Misconfiguration](https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration)\n- [OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n\n## Common Weakness Enumeration (CWE)\n\n- [CWE-494: Download of Code Without Integrity Check](https://cwe.mitre.org/data/definitions/494.html)\n- [CWE-829: Inclusion of Functionality from Untrusted Control Sphere](https://cwe.mitre.org/data/definitions/829.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-3158a975-192c-4e17-b3be-fb52e0bda9ec",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nA potential Man-in-the-Middle (MitM) attack can occur due to the use of the `ADD` command in URL file inclusion in JavaScript. This vulnerability allows an attacker to intercept and possibly alter the communication between two parties who believe they are directly communicating with each other. In this case, the `ADD` command is used to include a file from a URL, which can be intercepted and manipulated by an attacker.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the `COPY` command instead of the `ADD` command for file inclusion. The `COPY` command is safer as it copies in local files, not files from a URL, reducing the risk of a MitM attack.\n\n## Source Code Fix Recommendation\n\nReplace the `ADD` command with the `COPY` command:\n\n```javascript\nCOPY extras extras\n```\n\n## Library Dependencies\n\nNo specific library dependencies are required for the code example to execute properly.\n\n## OWASP and CWE Resources\n\n- [CWE-300: Channel Accessible by Non-Endpoint ('Man-in-the-Middle')](https://cwe.mitre.org/data/definitions/300.html)\n\nPlease note that these links are active and accessible for anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-c422aec1-df6a-47b9-8c13-f5ac6a5b1988",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn JavaScript programming, a potential Man-in-the-Middle (MitM) attack can occur due to the use of the ADD command in URL file inclusion. This vulnerability arises when a Dockerfile uses the ADD command to fetch remote resources, which are then included in the Docker image. The ADD command does not validate the authenticity of the remote server, and thus, an attacker can potentially intercept the request and replace the content of the file.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the COPY command instead of the ADD command for local file inclusion. The COPY command is safer as it only allows files to be copied from a local file system, thus eliminating the risk of a MitM attack.\n\n## Source Code Fix Recommendation\n\nReplace the ADD command with the COPY command in your Dockerfile:\n\n```Dockerfile\nCOPY extras/image/home /home/sysadmin\n```\n\n## Library Dependencies\n\nThe code example does not require any specific library dependencies to execute properly.\n\n## OWASP and CWE Resources\n\n- [CWE-441: Unintended Proxy or Intermediary ('Confused Deputy')](https://cwe.mitre.org/data/definitions/441.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-ef8ae91c-7eb6-4786-b5b4-fb3d5c1a4f2d",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Docker, the `RUN` command is used to execute commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the `Dockerfile`. If `sudo` is used in the `RUN` command, it can lead to potential security vulnerabilities. \n\nThe `sudo` command allows a permitted user to execute a command as the superuser or another user, as specified by the security policy. When a Dockerfile is run with `sudo`, it means that the process is running with root privileges. This can be a security risk because if the process is compromised, it could lead to a complete takeover of the system.\n\nMoreover, the `chown` command changes the user and/or group ownership of each given file. If a non-root user is not specified, the files could be owned by the root user, which can also lead to potential security vulnerabilities.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid using `sudo` in your Dockerfiles. Instead, use a non-root user to run processes. This can be done by creating a new user and switching to it before executing any commands. \n\n## Source Code Fix Recommendation\n\nHere is a recommended fix for the provided code:\n\n```Dockerfile\nRUN useradd -ms /bin/bash newuser\nUSER newuser\nRUN chown -R newuser:newuser /home/newuser\n```\n\nIn this fix, a new user `newuser` is created and then switched to. The `chown` command is then used to change the ownership of the files to `newuser`.\n\n## Library Dependencies\n\nThe provided code does not require any Python library dependencies to execute properly.\n\n## References\n\n- [CWE-250: Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)"
+              },
+              "properties": {
+                "tags": [
+                  "dockerfile.security.no-sudo-in-dockerfile.no-sudo-in-dockerfile"
+                ]
+              }
+            },
+            {
+              "id": "glog-099e6d01-5b03-4ceb-b9c2-d1684568f399",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe \"Potential for Root User Exploitation in Docker Containers\" vulnerability refers to the risk of a Docker container running with root privileges being exploited. If an attacker gains access to the container, they could potentially gain root access to the host system, leading to a serious security breach. This is particularly relevant when the Docker container is initiated with the `ENTRYPOINT [\"bash\"]` command in a Dockerfile, which runs the container with root privileges by default.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to follow the principle of least privilege. This means running your Docker containers as a non-root user whenever possible. This can be achieved by creating a new user in your Dockerfile and switching to this user before executing any commands.\n\n## Source Code Fix Recommendation\n\nHere is an example of how you can modify your Dockerfile to run as a non-root user:\n\n```Dockerfile\nFROM node:14\nRUN useradd -m myuser\nUSER myuser\nENTRYPOINT [\"bash\"]\n```\n\nIn this example, a new user named `myuser` is created and the `USER` instruction is used to switch to this user. The `ENTRYPOINT` command is then run as this non-root user.\n\n## Library Dependencies\n\nThe code example provided does not require any specific JavaScript library dependencies to execute properly.\n\n## References\n\n- [CWE-250: Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.missing-user"
+                ]
+              }
+            },
+            {
+              "id": "glog-a86d9219-2bfe-4fa4-abfb-170eac0ea1ff",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe vulnerability \"Need for Explicit Version Tagging in Image Creation for Deterministic Container Images\" arises when Docker images are built without specifying a version tag for the base image in the Dockerfile. This can lead to non-deterministic builds, as the `latest` tag (which is the default when no tag is specified) can point to different images over time. This can lead to unexpected behavior, security vulnerabilities, or broken builds when the `latest` image changes.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, always specify a version tag when defining the base image in the Dockerfile. This ensures that the build is deterministic and always uses the same base image. \n\n## Source Code Fix Recommendation\n\nIf the Dockerfile looks like this:\n\n```Dockerfile\nFROM python\n```\n\nIt should be changed to include a specific version tag, like this:\n\n```Dockerfile\nFROM python:3.8\n```\n\nThis ensures that the Docker image is always built using Python 3.8, regardless of what the `latest` tag points to.\n\n## Dependencies\n\nThis vulnerability does not depend on any specific Python libraries. It is related to the Dockerfile and the way Docker images are built.\n\n## References\n\n- [OWASP Docker Security](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-676: Use of Potentially Dangerous Function](https://cwe.mitre.org/data/definitions/676.html)"
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.missing-image-version"
+                ]
+              }
+            },
+            {
+              "id": "glog-71a3d0db-02b6-4b71-9b63-5198720f0e22",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\n\"Root User Vulnerability in Container\" is a security vulnerability that occurs when a Docker container is run as a root user. This is a serious security issue because if an attacker manages to break out from the container, they would have root access to the host system. This could lead to a complete system compromise.\n\nIn Python programming, this vulnerability can occur if the Dockerfile used to create the Docker image for the Python application contains the line `USER root`, which instructs Docker to run the container as a root user.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, avoid running Docker containers as a root user. Instead, create a non-root user in your Dockerfile and switch to that user before executing the application.\n\n## Source Code Fix Recommendation\n\nHere is an example of how to create a non-root user in a Dockerfile for a Python application:\n\n```Dockerfile\nFROM python:3.7\n\n# Create a non-root user\nRUN useradd -m myuser\n\n# Switch to the new user\nUSER myuser\n\n# Continue with your application setup...\n```\n\nIn this example, `useradd -m myuser` creates a new user named `myuser`, and `USER myuser` switches to that user.\n\n## Library Dependencies\n\nThe code example does not require any specific Python library dependencies to execute properly.\n\n## References\n\n- [OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-250: Execution with Unnecessary Privileges](https://cwe.mitre.org/data/definitions/250.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "dockerfile.security.last-user-is-root.last-user-is-root"
+                ]
+              }
+            },
+            {
+              "id": "glog-d79e6330-f316-46e3-bd22-d6c4e39ba78c",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Dockerfile scripts, the `RUN cd ...` command is often used to change the current working directory. However, this can lead to potential misuse and confusion because each `RUN` command in a Dockerfile executes in a new shell, and the directory change does not persist across multiple `RUN` commands. This can lead to unexpected behavior and potential security vulnerabilities if subsequent commands assume they are being run in a different directory.\n\n## Mitigation Advice\n\nInstead of using `RUN cd ...`, it is recommended to use the `WORKDIR` command in Dockerfiles. The `WORKDIR` command changes the working directory for all subsequent commands in the Dockerfile, and this change persists across multiple commands. This makes the Dockerfile more readable and less prone to errors and potential security vulnerabilities.\n\n## Source Code Fix Recommendation\n\nReplace the `RUN cd ...` commands with `WORKDIR` commands:\n\n```Dockerfile\nRUN echo \"At end of packages install, now doing VNC\"\nWORKDIR /app\nRUN ls -l\nWORKDIR /tmp\nRUN ls -l\nWORKDIR /\nRUN ls -l\n```\n\n## Library Dependencies\n\nThe code example does not require any specific Python library dependencies to execute properly. It is a Dockerfile script and its execution depends on Docker.\n\n## OWASP and CWE Resources\n\n- [CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')](https://cwe.mitre.org/data/definitions/22.html)\n\nPlease note that the links provided are valid and active for anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.use-workdir"
+                ]
+              }
+            },
+            {
+              "id": "glog-b9cb3e9e-78db-4955-a4b7-06dc002c2819",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nIn Python programming, the vulnerability \"Potential Man-in-the-Middle Attack due to ADD Command in URL File Inclusion; COPY Command Preferred\" typically occurs when the Docker ADD command is used to fetch remote files. The ADD command can lead to a potential Man-in-the-Middle (MitM) attack because it does not validate the authenticity of the remote server. An attacker can exploit this vulnerability to inject malicious code or alter the content of the fetched file.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, it is recommended to use the COPY command instead of the ADD command when copying local files in Docker. The COPY command is safer because it only supports the basic copying of local files into the container, while ADD has potentially dangerous functions such as local-only file extraction and remote URL support.\n\n## Source Code Fix Recommendation\n\nReplace the ADD command with the COPY command in your Dockerfile:\n\n```Dockerfile\nCOPY extras/image/home /users/default\n```\n\n## Library Dependencies\n\nThe code example provided does not require any specific Python library dependencies to execute properly. It is a Dockerfile command, not a Python code.\n\n## OWASP and CWE Resources\n\n- [OWASP Docker Security](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-494: Download of Code Without Integrity Check](https://cwe.mitre.org/data/definitions/494.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.prefer-copy-over-add"
+                ]
+              }
+            },
+            {
+              "id": "glog-b4ce623e-d6ea-48ea-8dc5-1061d7a5fc73",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe vulnerability arises from the use of `RUN cd ...` command in a Dockerfile instead of `WORKDIR`. The `RUN cd ...` command changes the working directory only for the current RUN command. It does not persist for the subsequent RUN commands. This can lead to unexpected behavior and potential security risks if the subsequent commands depend on the changed directory.\n\n## Mitigation Advice\n\nThe recommended way to change the working directory in a Dockerfile is to use the `WORKDIR` command. The `WORKDIR` command changes the working directory for the subsequent instructions in the Dockerfile. If the directory does not exist, it will be created.\n\n## Source Code Fix Recommendation\n\nReplace the `RUN cd ...` command with `WORKDIR`. Here is the fixed version of the Dockerfile:\n\n```Dockerfile\nWORKDIR /users/default\nRUN chmod a+x .bashrc && chmod a+x setTmpDir.sh\n\n# TODO:\n# For Plexus, we need to put a home directory for the user on\n# /datasets/teams/hackathon-testing\n#\n# and then fix up .bashrc to cd to the new home directory\n```\n\n## Library Dependencies\n\nThe code example does not require any Python library dependencies to execute properly.\n\n## OWASP and CWE Links\n\n- [OWASP Docker Security](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')](https://cwe.mitre.org/data/definitions/22.html)\n\nPlease note that the links provided are active and accessible to anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.use-workdir"
+                ]
+              }
+            },
+            {
+              "id": "glog-12340ef9-3b89-474c-9b26-904612b25200",
+              "help": {
+                "text": "",
+                "markdown": "## Description\n\nThe `RUN` instruction in a Dockerfile executes commands in a new layer on top of the current image and commits the results. The resulting committed image is used for the next step in the Dockerfile. If the `pipefail` option is not set, a pipeline returns the exit status of the last command executed. This means that if an error occurs in any command in the pipeline except the last one, it will be ignored by the shell.\n\nIn the provided code example, the `echo` command is piping the output to `chpasswd`. If `echo` fails for any reason (for example, if `ADMIN_USERNAME` or `ADMIN_PASSWORD` is not set), the shell will not report an error because `chpasswd` is the last command in the pipeline.\n\n## Mitigation Advice\n\nTo mitigate this vulnerability, you should set the `pipefail` option before running a pipeline. This will cause the pipeline to return the status of the last command that exited with a non-zero status, or zero if all commands exited successfully. This way, if any command in the pipeline fails, the error will be caught and reported by the shell.\n\n## Source Code Fix Recommendation\n\nHere is how you can fix the provided code example:\n\n```Dockerfile\nRUN set -o pipefail && echo \"${ADMIN_USERNAME}:${ADMIN_PASSWORD}\" | chpasswd\n```\n\n## Library Dependencies\n\nThe provided code example does not require any Python library dependencies to execute properly. It uses built-in shell commands and environment variables.\n\n## References\n\n- [OWASP Docker Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Docker_Security_Cheat_Sheet.html)\n- [CWE-685: Function Call With Incorrect Number of Arguments](https://cwe.mitre.org/data/definitions/685.html)\n\nPlease note that the links provided are valid and active for anonymous users at the time of writing this report."
+              },
+              "properties": {
+                "tags": [
+                  "resources.rules.set-pipefail"
+                ]
+              }
+            }
+          ],
+          "language": "en-US",
+          "contents": [
+            "localizedData",
+            "nonLocalizedData"
+          ],
+          "isComprehensive": false
+        }
+      },
+      "language": "en-US",
+      "results": [
+        {
+          "ruleId": "glog-5ea64a34-bc18-4e26-9e0a-20357f623702",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Prefer COPY command over ADD to avoid potential man-in-the-middle attacks."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 69,
+                  "startColumn": 1,
+                  "endLine": 69,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD bare_system/Makefile Makefile"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_1"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-784a08a4-603d-44a8-97ea-2d001b75b5db",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Dockerfiles: Minimize Vulnerabilities by Not Using Sudo and Running Processes as Non-Root User\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 1,
+                  "endLine": 52,
+                  "endColumn": 35,
+                  "snippet": {
+                    "text": "RUN sudo usermod -aG sudo sysadmin"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fd031c46d268e808af199d8864e82a795da1b8e9bcec75f875f9dcb41b0f2c8c61991aefd8ebe3e003673de8a8d8f225ce4e1d92bdbe2597932f9cd1ea2c3f10_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-10facaed-e5a2-4966-8a85-f3d6639dd4c4",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Dockerfiles: Minimize Vulnerabilities by Not Using Sudo and Running Processes as Non-Root User\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 55,
+                  "startColumn": 1,
+                  "endLine": 55,
+                  "endColumn": 44,
+                  "snippet": {
+                    "text": "RUN sudo chmod 0440 /etc/sudoers.d/sysadmin"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fd031c46d268e808af199d8864e82a795da1b8e9bcec75f875f9dcb41b0f2c8c61991aefd8ebe3e003673de8a8d8f225ce4e1d92bdbe2597932f9cd1ea2c3f10_2"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-46a9837c-58aa-45cd-85e0-138ff072dccd",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Potential Man-in-the-Middle Attack Vulnerability due to ADD Command in URL File Inclusion\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 68,
+                  "startColumn": 1,
+                  "endLine": 68,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD bare_system bare_system"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-0e41b8b1-7727-4c1b-8d0a-90c0f2f9b6e4",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential man-in-the-middle attack due to the use of ADD command in URL file inclusion, prefer using COPY command."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 70,
+                  "startColumn": 1,
+                  "endLine": 70,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD rocm rocm"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_2"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-4db867b0-21b6-445a-b43a-a0b3fab70945",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential Man-in-the-Middle Attack due to ADD Command in URL File Inclusion, Prefer COPY Command Usage"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 72,
+                  "startColumn": 1,
+                  "endLine": 72,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD tools tools"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_4"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-0dc15d97-fcbd-4a90-97df-53b88c051cb5",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Potential Man-in-the-Middle Attack Risk with ADD Command; COPY Command Preferred\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 1,
+                  "endLine": 76,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD extras/image/etc  /etc"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_6"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-3158a975-192c-4e17-b3be-fb52e0bda9ec",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential Man-in-the-Middle Attack due to ADD Command in URL File Inclusion; COPY Command Preferred."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 73,
+                  "startColumn": 1,
+                  "endLine": 73,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD extras extras"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_5"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-c422aec1-df6a-47b9-8c13-f5ac6a5b1988",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential Man-in-the-Middle Attack due to ADD Command in URL File Inclusion, Prefer COPY Command Usage"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 1,
+                  "endLine": 78,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD extras/image/home /home/sysadmin"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fbfe99db89d11d758f9e20b105f82c4b2a7149cbb245e70d00df3f4230b5661b01c0f7ee9cc172dc624f08dd6ccf06127bf99a36981f2f58d7e7f13645c356d1_8"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-ef8ae91c-7eb6-4786-b5b4-fb3d5c1a4f2d",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Dockerfiles: Minimize Vulnerabilities by Not Using Sudo and Running Processes as Non-Root User\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 1,
+                  "endLine": 80,
+                  "endColumn": 51,
+                  "snippet": {
+                    "text": "RUN sudo chown -R sysadmin:sysadmin /home/sysadmin"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "fd031c46d268e808af199d8864e82a795da1b8e9bcec75f875f9dcb41b0f2c8c61991aefd8ebe3e003673de8a8d8f225ce4e1d92bdbe2597932f9cd1ea2c3f10_3"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-099e6d01-5b03-4ceb-b9c2-d1684568f399",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential for Root User Exploitation in Docker Containers"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "bare_system/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 85,
+                  "startColumn": 1,
+                  "endLine": 85,
+                  "endColumn": 20,
+                  "snippet": {
+                    "text": "ENTRYPOINT [\"bash\"]"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "834ba6edb3659e4e09b4b9846e2f740aec337c70502ac31bf3ba986f297658b37e6ce83349af30c19ddc3b9b42b04da704d048e93e02c1fdc55ab513b99c446e_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-a86d9219-2bfe-4fa4-abfb-170eac0ea1ff",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Need for Explicit Version Tagging in Image Creation for Deterministic Container Images\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "comm/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 18,
+                  "startColumn": 18,
+                  "endLine": 18,
+                  "endColumn": 30,
+                  "snippet": {
+                    "text": "#  consumed with FROM command"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "e5764cf61074db34678e3c942c7b1e3b7472105d21af887a11bd590c0a1eff84b6dc96feb9f23d7a15a575506d144e70f9f9a66abf2a6fb67f3070ad9860d909_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-71a3d0db-02b6-4b71-9b63-5198720f0e22",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Root User Vulnerability in Container\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "comm/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 27,
+                  "startColumn": 1,
+                  "endLine": 27,
+                  "endColumn": 10,
+                  "snippet": {
+                    "text": "USER root"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "c8f9877ebeed9f48754706a6866def14c6463abb1f84a62c76ff67a245a5faf0f1a354e21b7a184ba91928d410952a687b2abd8af1d142dd48fbddb0b97ed31b_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-d79e6330-f316-46e3-bd22-d6c4e39ba78c",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Potential Misuse of 'RUN cd ...' in Container, Prefer 'WORKDIR'\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "extras/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 159,
+                  "startColumn": 1,
+                  "endLine": 159,
+                  "endColumn": 59,
+                  "snippet": {
+                    "text": "RUN echo \"At end of packages install, now doing VNC\" && cd /app && ls -l && cd /tmp && ls -l && cd && ls -l"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "f7be0b78e0a12fda885bf07222307eab2340296e4ac79f7fc6cec09ddf1358965443ca7d27798c32051f2a39800fb124acac5fc637c307d552cc257cff3ef614_0"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-b9cb3e9e-78db-4955-a4b7-06dc002c2819",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "Potential Man-in-the-Middle Attack due to ADD Command in URL File Inclusion; COPY Command Preferred."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "extras/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 168,
+                  "startColumn": 1,
+                  "endLine": 168,
+                  "endColumn": 4,
+                  "snippet": {
+                    "text": "ADD extras/image/home /users/default"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "91fcfa7e3281960521bdc3cbf138a749790550f17bacb766ddc73366d343136e3d71d798886caab5adc8f791b8b4fa870ef1778400123a20eb98060307cac6e8_2"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-b4ce623e-d6ea-48ea-8dc5-1061d7a5fc73",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Potential malfunction in container due to 'RUN cd ...' instead of 'WORKDIR'\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "extras/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 182,
+                  "startColumn": 1,
+                  "endLine": 188,
+                  "endColumn": 32,
+                  "snippet": {
+                    "text": "RUN  chmod a+x /users/default/.bashrc && chmod a+x /users/default/setTmpDir.sh\n\n# TODO:\n# For Plexus, we need to put a home directory for the user on\n# /datasets/teams/hackathon-testing\n#\n# and then fix up .bashrc to cd to the new home directory"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "f7be0b78e0a12fda885bf07222307eab2340296e4ac79f7fc6cec09ddf1358965443ca7d27798c32051f2a39800fb124acac5fc637c307d552cc257cff3ef614_1"
+          },
+          "properties": {}
+        },
+        {
+          "ruleId": "glog-12340ef9-3b89-474c-9b26-904612b25200",
+          "kind": "fail",
+          "level": "warning",
+          "message": {
+            "text": "\"Potential Vulnerability in RUN Instruction Evaluation without 'pipefail' Set\""
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "extras/Dockerfile",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 195,
+                  "startColumn": 1,
+                  "endLine": 195,
+                  "endColumn": 59,
+                  "snippet": {
+                    "text": "RUN  echo \"${ADMIN_USERNAME}:${ADMIN_PASSWORD}\" | chpasswd"
+                  }
+                }
+              }
+            }
+          ],
+          "fingerprints": {
+            "matchBasedId/v1": "2a7ed8a5ad35431ae7760253661020d512c8d5dc22f22367fcae157db3675fdcb5ddfb795ae6ce6d0f1a00a5b3ed31be1aa738851406cb00401a4dbf60d51cf5_0"
+          },
+          "properties": {}
+        }
+      ],
+      "newlineSequences": [
+        "\r\n",
+        "\n"
+      ]
+    }
+  ]
+}
